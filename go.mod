@@ -12,5 +12,5 @@ require (
 	github.com/stts-se/rbg2p v1.0.1
 	github.com/stts-se/symbolset v0.0.0-20210730194000-527cefa8ba3f
 	golang.org/x/net v0.7.0
-	golang.org/x/text v0.7.0
+	golang.org/x/text v0.8.0
 )
