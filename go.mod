@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/dlclark/regexp2 v1.11.0
 	github.com/go-errors/errors v1.4.2
-	github.com/go-sql-driver/mysql v1.7.1
+	github.com/go-sql-driver/mysql v1.8.0
 	github.com/gorilla/mux v1.8.1
 	//github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mattn/go-sqlite3 v1.14.22
@@ -14,3 +14,5 @@ require (
 	golang.org/x/net v0.22.0
 	golang.org/x/text v0.14.0
 )
+
+require filippo.io/edwards25519 v1.1.0 // indirect
