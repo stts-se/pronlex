@@ -12,7 +12,7 @@ require (
 	github.com/stts-se/rbg2p v1.0.1
 	github.com/stts-se/symbolset v0.0.0-20210730194000-527cefa8ba3f
 	golang.org/x/net v0.25.0
-	golang.org/x/text v0.15.0
+	golang.org/x/text v0.16.0
 )
 
 require filippo.io/edwards25519 v1.1.0 // indirect
