@@ -3,7 +3,7 @@ module github.com/stts-se/pronlex
 go 1.19
 
 require (
-	github.com/dlclark/regexp2 v1.11.2
+	github.com/dlclark/regexp2 v1.11.4
 	github.com/go-errors/errors v1.4.2
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/mux v1.8.1
