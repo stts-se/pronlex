@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gorilla/mux v1.8.1
 	//github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/mattn/go-sqlite3 v1.14.23
+	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/stts-se/rbg2p v1.0.1
 	github.com/stts-se/symbolset v0.0.0-20210730194000-527cefa8ba3f
 	golang.org/x/net v0.29.0
