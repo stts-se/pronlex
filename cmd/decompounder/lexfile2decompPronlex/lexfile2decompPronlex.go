@@ -9,6 +9,7 @@ package main
 import (
 	"bufio"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -515,7 +516,7 @@ func HerusticSvNSTTransDecomp(orthDecomp, trans string) ([]string, error) {
 	if len(res) != len(decomps) {
 		msg := "failed to match decomps and transparts"
 		if err == nil {
-			err = fmt.Errorf(msg)
+			err = errors.New(msg)
 		} else {
 			err = fmt.Errorf("%v : %s", err, msg)
 		}
@@ -687,25 +688,25 @@ func collapseEntriesWithSamePOS(w string, f []Freq) []lex.Entry {
 }
 
 /*
-func dump(m map[string]map[WP]int) {
-	for k, v := range m {
-		srt := freqSort(v)
-		tot := totFreq(srt)
-		min := 4
-		if tot > 50 {
-			min = 20
-		}
-		fltr := minFreqAndDifferentTrans(srt, min)
-		if len(fltr) == 0 && len(srt) > 0 {
-			fltr = srt[0:1]
-		}
-		if tot > 5 {
-			for _, s := range fltr {
-				fmt.Printf("%d\t%s\t%v\n", tot, k, s)
+	func dump(m map[string]map[WP]int) {
+		for k, v := range m {
+			srt := freqSort(v)
+			tot := totFreq(srt)
+			min := 4
+			if tot > 50 {
+				min = 20
+			}
+			fltr := minFreqAndDifferentTrans(srt, min)
+			if len(fltr) == 0 && len(srt) > 0 {
+				fltr = srt[0:1]
+			}
+			if tot > 5 {
+				for _, s := range fltr {
+					fmt.Printf("%d\t%s\t%v\n", tot, k, s)
+				}
 			}
 		}
 	}
-}
 */
 func toFile(m map[string]map[WP]int, fileName string) error {
 

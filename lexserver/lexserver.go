@@ -41,7 +41,7 @@ func getLexRefParam(r *http.Request) (lex.LexRef, error) {
 	lexRefS := getParam("lexicon_name", r)
 	if strings.TrimSpace(lexRefS) == "" {
 		msg := "input param <lexicon_name> must not be empty"
-		return lex.LexRef{}, fmt.Errorf(msg)
+		return lex.LexRef{}, errors.New(msg)
 	}
 	lexRef, err := lex.ParseLexRef(lexRefS)
 	if err != nil {
@@ -114,15 +114,15 @@ func removeInitialSlash(url string) string {
 }
 
 /*
-func (rout subRouter) handlerExamples() []string {
-	res := []string{}
-	for _, handler := range rout.handlers {
-		for _, example := range handler.examples {
-			res = append(res, rout.root+example)
+	func (rout subRouter) handlerExamples() []string {
+		res := []string{}
+		for _, handler := range rout.handlers {
+			for _, example := range handler.examples {
+				res = append(res, rout.root+example)
+			}
 		}
+		return res
 	}
-	return res
-}
 */
 func newSubRouter(rout *mux.Router, root string, description string) *subRouter {
 	var res = subRouter{
@@ -157,8 +157,8 @@ func protect(w http.ResponseWriter) {
 
 // TODO should go into config file
 var uploadFileArea string // = ioutil.TempDir("", filepath.Join("lexserver","upload_area"))
-//var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
-//var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
+// var downloadFileArea string  // = ioutil.TempDir("", filepath.Join("lexserver",""download_area"))
+// var symbolSetFileArea string // = filepath.Join(".", "symbol_files")
 var dbLocation *string  // = filepath.Join(".", "db_files")
 var staticFolder string // = "."
 
@@ -549,7 +549,7 @@ func webSockRegHandler(ws *websocket.Conn) {
 			break
 		}
 
-		log.Printf("webSockRegHandler: " + msg)
+		log.Printf("webSockRegHandler: %s", msg)
 
 		var pref = "CLIENT_ID: "
 		//var id string
@@ -610,11 +610,11 @@ func keepAlive(wsC chan string) {
 /*
 func apiChangedHandler(msg string) func(http.ResponseWriter, *http.Request) {
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, fmt.Sprintf("the API has changed: %s\n", msg), http.StatusBadRequest)
-		return
+		return func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, fmt.Sprintf("the API has changed: %s\n", msg), http.StatusBadRequest)
+			return
+		}
 	}
-}
 */
 func isStaticPage(url string) bool {
 	return url == "/" || strings.Contains(url, "externals") || strings.Contains(url, "built") || url == "/websockreg" || url == "/favicon.ico" || url == "/static/" || url == "/ipa_table.txt" || url == "/ping" || url == "/version"
@@ -655,9 +655,9 @@ Flags:
 
 		fmt.Fprintf(os.Stderr, `
 Default ports:
-     `+port+`  for the standard server
-     `+testPort+`  for the test server
-`)
+     %s  for the standard server
+     %s  for the test server
+`, port, testPort)
 	}
 
 	flag.Usage = func() {
@@ -795,7 +795,7 @@ Default ports:
 				log.Fatal(fmt.Errorf("lexserver: couldn't start server on port %s : %v", port, err))
 			}
 		}()
-		log.Printf("lexserver: server up and running using port " + port)
+		log.Printf("lexserver: server up and running using port %s", port)
 
 		<-stop
 

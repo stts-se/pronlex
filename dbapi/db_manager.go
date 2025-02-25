@@ -2,6 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"sort"
@@ -108,7 +109,7 @@ func (dbm *DBManager) DefineDB(dbLocation string, dbRef lex.DBRef) error {
 	// err := dbm.OpenDB(dbRef, dbPath)
 	// if err != nil {
 	// 	msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
-	// 	return fmt.Errorf(msg)
+	// 	return errors.New(msg)
 	// }
 
 	// db, ok := dbm.dbs[dbRef]
@@ -119,13 +120,13 @@ func (dbm *DBManager) DefineDB(dbLocation string, dbRef lex.DBRef) error {
 	err := dbm.dbif.defineDB(dbLocation, dbRef)
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineDB: failed to define db : %v", err)
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	err = dbm.OpenDB(dbLocation, dbRef)
 	if err != nil {
 		msg := fmt.Sprintf("DBManager.DefineDB: failed to open db : %v", err)
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	// db, ok := dbm.dbs[dbRef]

@@ -4,6 +4,7 @@ package dbapi
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -86,7 +87,7 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 // 		}
 
 // 		log.Print(msg)
-// 		return res, fmt.Errorf(msg)
+// 		return res, errors.New(msg)
 // 	}
 // 	defer rows.Close()
 // 	for rows.Next() {
@@ -98,7 +99,7 @@ func listNamesOfTriggers(db *sql.DB) ([]string, error) {
 // 			if err2 != nil {
 // 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 			}
-// 			return res, fmt.Errorf(msg)
+// 			return res, errors.New(msg)
 // 		}
 // 		res = append(res, name)
 // 	}
@@ -139,7 +140,7 @@ func (sdb sqliteDBIF) getSchemaVersionTx(tx *sql.Tx) (string, error) {
 		}
 
 		log.Println(msg)
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	return res, nil
@@ -339,7 +340,7 @@ func (sdb sqliteDBIF) deleteLexiconTx(tx *sql.Tx, lexName string) error {
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	if !lexExists {
 		return fmt.Errorf("dbapi.DeleteLexiconTx : no lexicon exists with name : %s", lexName)
@@ -355,7 +356,7 @@ func (sdb sqliteDBIF) deleteLexiconTx(tx *sql.Tx, lexName string) error {
 		return err
 	}
 	if n > 0 {
-		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: " + strconv.Itoa(n) + ")")
+		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: %s)", strconv.Itoa(n))
 	}
 
 	_, err = tx.Exec("delete from lexicon where name = ?", lexName)
@@ -367,7 +368,7 @@ func (sdb sqliteDBIF) deleteLexiconTx(tx *sql.Tx, lexName string) error {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	return nil
 }
@@ -415,7 +416,7 @@ func (sdb sqliteDBIF) lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 		}
 
-// 		return fmt.Errorf(msg)
+// 		return errors.New(msg)
 // 	}
 // 	if !lexExists {
 // 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : no lexicon exists with name : %s", lexName)
@@ -429,7 +430,7 @@ func (sdb sqliteDBIF) lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 		if err2 != nil {
 // 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 		}
-// 		return fmt.Errorf(msg)
+// 		return errors.New(msg)
 // 	}
 // 	log.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
 
@@ -443,7 +444,7 @@ func (sdb sqliteDBIF) lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 		}
 
-// 		return fmt.Errorf(msg)
+// 		return errors.New(msg)
 // 	}
 
 // 	log.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
@@ -453,8 +454,8 @@ func (sdb sqliteDBIF) lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 	return nil
 // }
 
-//TODO: Check that lexName exists, or report error
-//TODO: Check that entryID exists, or report error
+// TODO: Check that lexName exists, or report error
+// TODO: Check that entryID exists, or report error
 func (sdb sqliteDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	tx, err := db.Begin()
 	if err != nil {
@@ -465,7 +466,7 @@ func (sdb sqliteDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (in
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 	defer tx.Commit()
 
@@ -479,7 +480,7 @@ func (sdb sqliteDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (in
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 
 	res, err := tx.Exec("DELETE FROM entry WHERE  id = ? AND lexiconid IN (SELECT id FROM lexicon WHERE name = ?)", entryID, lexName)
@@ -491,7 +492,7 @@ func (sdb sqliteDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (in
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 
 	i, err := res.RowsAffected()
@@ -503,7 +504,7 @@ func (sdb sqliteDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (in
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 
 	// No db error, entry id or lexicon name may be wrong
@@ -541,7 +542,7 @@ func (sdb sqliteDBIF) defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 	if strings.TrimSpace(l.symbolSetName) == "" {
 		msg := fmt.Sprintf("failed to define lexicon with empty symbolSetName : %v", l)
@@ -551,7 +552,7 @@ func (sdb sqliteDBIF) defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 
 	res, err := tx.Exec("insert into lexicon (name, symbolsetname, locale) values (?, ?, ?)", strings.ToLower(l.name), l.symbolSetName, l.locale)
@@ -562,7 +563,7 @@ func (sdb sqliteDBIF) defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 
 	id, err := res.LastInsertId()
@@ -574,7 +575,7 @@ func (sdb sqliteDBIF) defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 
 	//tx.Commit()
@@ -605,11 +606,11 @@ func (sdb sqliteDBIF) defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 func (sdb sqliteDBIF) moveNewEntries(db *sql.DB, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
 	if strings.TrimSpace(newSource) == "" {
 		msg := "MoveNewEntries called with the empty 'newSource' argument"
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 	if strings.TrimSpace(newStatus) == "" {
 		msg := "MoveNewEntries called with the empty 'newStatus' argument"
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 
 	tx, err := db.Begin()
@@ -630,7 +631,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 	if strings.TrimSpace(newStatus) == "" {
 		msg := "moveNewEntriesTx called with the empty 'newStatus' argument"
@@ -639,7 +640,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 
 	res := MoveResult{}
@@ -652,7 +653,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	toLex, err := sdb.getLexiconTx(tx, toLexicon)
 	if err != nil {
@@ -662,7 +663,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	const where = `WHERE entry.id IN (SELECT a.id FROM entry a WHERE a.lexiconid = ?
@@ -680,7 +681,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	//_ = q0Rez
@@ -697,7 +698,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	//TODO Should this result in an error and rollback?
@@ -717,7 +718,7 @@ func (sdb sqliteDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSo
 var entrySTMTSqlite = "insert into entry (lexiconid, strn, language, partofspeech, morphology, wordparts, preferred) values (?, ?, ?, ?, ?, ?, ?)"
 var transAfterEntrySTMTSqlite = "insert into transcription (entryid, strn, language, sources) values (?, ?, ?, ?)"
 
-//var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
+// var statusSetCurrentFalse = "UPDATE entrystatus SET current = 0 WHERE entrystatus.entryid = ?"
 var insertStatusSqlite = "INSERT INTO entrystatus (entryid, name, source) values (?, ?, ?)"
 
 // InsertEntries saves a list of Entries and associates them to Lexicon
@@ -751,7 +752,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 		// convert 'Preferred' into DB integer value
 		var pref int64
@@ -769,7 +770,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 				if err2 != nil {
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -788,7 +789,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 
 		id, err := res.LastInsertId()
@@ -799,7 +800,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 		// We want thelex.Entry to have the right id for inserting lemma assocs below
 		e.ID = id
@@ -817,7 +818,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -832,7 +833,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 			err = sdb.associateLemma2Entry(tx, lemma, e)
 			if err != nil {
@@ -842,7 +843,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -855,7 +856,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -876,7 +877,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -888,7 +889,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 
 		err = sdb.insertEntryComments(tx, e.ID, e.Comments)
@@ -900,7 +901,7 @@ func (sdb sqliteDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]in
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 
 	}
@@ -915,9 +916,9 @@ var insertEntryTagSqlite = "INSERT INTO EntryTag (entryId, tag) values (?, ?)"
 
 //TODO Add tests
 
-//TODO Add db look-up to see if db uniqueness constraints are
-//violated, to return more gentle error (or no error) instead of
-//failing and rolling back.
+// TODO Add db look-up to see if db uniqueness constraints are
+// violated, to return more gentle error (or no error) instead of
+// failing and rolling back.
 func (sdb sqliteDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
@@ -1040,7 +1041,7 @@ func (sdb sqliteDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) (
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return result, fmt.Errorf(msg)
+		return result, errors.New(msg)
 	}
 	defer rows.Close()
 
@@ -1063,14 +1064,14 @@ func (sdb sqliteDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) (
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return nil, fmt.Errorf(msg)
+		return nil, errors.New(msg)
 	}
 
 	return result, nil
 }
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
-//lex.EntryWriter.
+// lex.EntryWriter.
 func (sdb sqliteDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 	//log.Printf("dbapi lookUp QUWRY %#v\tempty?%v\n\n", q, q.Empty())
 
@@ -1094,7 +1095,7 @@ func (sdb sqliteDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, 
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	lexiconMap, err := sdb.getLexiconMapTx(tx)
@@ -1106,7 +1107,7 @@ func (sdb sqliteDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, 
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	for _, lexName := range lexNames {
 		_, ok := lexiconMap[string(lexName)]
@@ -1117,7 +1118,7 @@ func (sdb sqliteDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, 
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return fmt.Errorf(msg)
+			return errors.New(msg)
 		}
 	}
 	return nil
@@ -1150,7 +1151,7 @@ func (sdb sqliteDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out 
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	defer rows.Close()
 
@@ -1377,7 +1378,7 @@ func (sdb sqliteDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out 
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	return nil
@@ -1460,7 +1461,7 @@ func (sdb sqliteDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updat
 			}
 		}
 
-		return res, updated, fmt.Errorf(msg)
+		return res, updated, errors.New(msg)
 	}
 	defer tx.Commit()
 
@@ -1471,7 +1472,7 @@ func (sdb sqliteDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updat
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, updated, fmt.Errorf(msg)
+		return res, updated, errors.New(msg)
 	}
 	err = tx.Commit()
 	if err != nil {
@@ -1486,7 +1487,7 @@ func (sdb sqliteDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, updat
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, updated, fmt.Errorf(msg)
+		return res, updated, errors.New(msg)
 	}
 	return res, updated, err
 }
@@ -1597,7 +1598,7 @@ func (sdb sqliteDBIF) updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.Language == dbE.Language {
 		return false, nil
@@ -1609,7 +1610,7 @@ func (sdb sqliteDBIF) updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1621,7 +1622,7 @@ func (sdb sqliteDBIF) updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry)
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.PartOfSpeech == dbE.PartOfSpeech {
 		return false, nil
@@ -1633,7 +1634,7 @@ func (sdb sqliteDBIF) updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry)
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1645,7 +1646,7 @@ func (sdb sqliteDBIF) updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.Morphology == dbE.Morphology {
 		return false, nil
@@ -1657,7 +1658,7 @@ func (sdb sqliteDBIF) updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1669,7 +1670,7 @@ func (sdb sqliteDBIF) updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.WordParts == dbE.WordParts {
 		return false, nil
@@ -1681,7 +1682,7 @@ func (sdb sqliteDBIF) updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1693,7 +1694,7 @@ func (sdb sqliteDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.Preferred == dbE.Preferred {
 		return false, nil
@@ -1714,7 +1715,7 @@ func (sdb sqliteDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 
@@ -1725,7 +1726,7 @@ func (sdb sqliteDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1744,7 +1745,7 @@ func (sdb sqliteDBIF) updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updat
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 	// Only one alternative left, to update old lemma with new values
@@ -1755,7 +1756,7 @@ func (sdb sqliteDBIF) updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (updat
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1768,7 +1769,7 @@ func (sdb sqliteDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	newTag := strings.TrimSpace(strings.ToLower(e.Tag))
@@ -1791,7 +1792,7 @@ func (sdb sqliteDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 		return true, nil
 	}
@@ -1803,7 +1804,7 @@ func (sdb sqliteDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	rows, err := sqlRes.RowsAffected()
 	if err != nil {
@@ -1812,7 +1813,7 @@ func (sdb sqliteDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if rows == 0 {
 		_, err := tx.Exec("INSERT into entrytag (tag, entryid) values (?, ?)", newTag, e.ID)
@@ -1822,7 +1823,7 @@ func (sdb sqliteDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 
@@ -1838,7 +1839,7 @@ func (sdb sqliteDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	return true, nil
@@ -1902,7 +1903,7 @@ func (sdb sqliteDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entr
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 		for _, t := range e.Transcriptions {
 			_, err := tx.Exec(transSTMTSqlite, e.ID, t.Strn, t.Language, t.SourcesString())
@@ -1913,7 +1914,7 @@ func (sdb sqliteDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entr
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return false, fmt.Errorf(msg)
+				return false, errors.New(msg)
 			}
 		}
 		// different sets of transcription, new ones inserted
@@ -1945,7 +1946,7 @@ func (sdb sqliteDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) 
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 
 		return true, nil
@@ -2005,7 +2006,7 @@ func (sdb sqliteDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []l
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return fmt.Errorf(msg)
+			return errors.New(msg)
 		}
 	}
 	return nil
@@ -2021,7 +2022,7 @@ func (sdb sqliteDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	defer tx.Commit()
 
@@ -2032,7 +2033,7 @@ func (sdb sqliteDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	err = tx.Commit()
 	if err != nil {
@@ -2060,7 +2061,7 @@ func (sdb sqliteDBIF) updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool,
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	err = sdb.insertEntryValidations(tx, e, e.EntryValidations)
@@ -2090,7 +2091,7 @@ func (sdb sqliteDBIF) updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Ent
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 
@@ -2111,7 +2112,7 @@ func (sdb sqliteDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	for _, cmt := range eComments {
@@ -2122,7 +2123,7 @@ func (sdb sqliteDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return fmt.Errorf(msg)
+			return errors.New(msg)
 		}
 
 	}
@@ -2249,7 +2250,7 @@ func (sdb sqliteDBIF) listEntryStatuses(db *sql.DB, lexiconName string, onlyCurr
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2291,7 +2292,7 @@ func (sdb sqliteDBIF) listEntryStatusesWithFreq(db *sql.DB, lexiconName string, 
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2332,7 +2333,7 @@ func (sdb sqliteDBIF) listEntryUsersWithFreq(db *sql.DB, lexiconName string, onl
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2373,7 +2374,7 @@ func (sdb sqliteDBIF) listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2408,7 +2409,7 @@ func (sdb sqliteDBIF) listCommentLabels(db *sql.DB, lexiconName string) ([]strin
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2698,7 +2699,7 @@ func (sdb sqliteDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error
 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 			}
 		}
-		return db, fmt.Errorf(msg)
+		return db, errors.New(msg)
 	}
 	//db.SetMaxOpenConns(1) // to avoid locking errors (but it makes it slow...?) https://github.com/mattn/go-sqlite3/issues/274
 	//db.SetMaxOpenConns(251)
@@ -2709,7 +2710,7 @@ func (sdb sqliteDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error
 
 		msg := fmt.Sprintf("dbapi_sqlite: failed to set foreign keys : %v", err)
 
-		return db, fmt.Errorf(msg)
+		return db, errors.New(msg)
 	}
 	_, err = db.Exec("PRAGMA case_sensitive_like=ON")
 	// TODO This looks odd, with error handling inside the error handling
@@ -2723,7 +2724,7 @@ func (sdb sqliteDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error
 			}
 		}
 
-		return db, fmt.Errorf(msg)
+		return db, errors.New(msg)
 	}
 	_, err = db.Exec("PRAGMA journal_mode=WAL")
 	// TODO This looks odd, with error handling inside the error handling
@@ -2737,7 +2738,7 @@ func (sdb sqliteDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error
 			}
 		}
 
-		return db, fmt.Errorf(msg)
+		return db, errors.New(msg)
 	}
 	return db, nil
 }
@@ -2762,7 +2763,7 @@ func (sbd sqliteDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
 
 			msg = fmt.Sprintf("%s : %s", msg, msg2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	return nil
 }

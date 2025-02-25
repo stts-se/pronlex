@@ -151,15 +151,22 @@ function parse_MariaDB_DSN() {
 	MARIADB_USER=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\1/'`
 	MARIADB_PROTOCOL=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\2/'`
 	MARIADB_HOST=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\3/'`
-	MARIADB_PORT=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\4/'`
+	MARIADB_PORT_NO=`echo $dsn | sed 's/^\([a-z_]*\):@\([a-z]*\)(\([0-9a-z.]*\):\([0-9]*\))$/\4/'`
 
-	if [ -z $MARIADB_USER ] ||[ -z $MARIADB_PROTOCOL ] || [ -z $MARIADB_HOST ] || [ -z $MARIADB_PORT ]; then
+	if [ -z $MARIADB_USER ] ||[ -z $MARIADB_PROTOCOL ] || [ -z $MARIADB_HOST ]; then # || [ -z $MARIADB_PORT ]; then
 	    echo "[$CMD] Couldn't parse MariaDB DSN: $dsn" >&2
 	    exit 1
 	fi
 	
 	if [ $MARIADB_HOST == "127.0.0.1" ]; then
 	    MARIADB_HOST="localhost"
+	fi
+
+	MARIADB_PORT="--port $MARIADB_PORT_NO"
+	if [ -z $MARIADB_PORT_NO ]; then
+	   MARIADB_PORT=""
+	elif [ $MARIADB_PORT_NO == "3306" ]; then
+	   MARIADB_PORT=""
 	fi
 
 	echo "MariaDB DSN $dsn parsed to user: $MARIADB_USER; host: $MARIADB_HOST" >&2
@@ -193,10 +200,10 @@ elif [ $DBENGINE == "mariadb" ]; then
     # 	echo "[$CMD] Not not implemented for $DBENGINE location '$DBLOCATION'. Please use '$DEFAULT_MARIADB_LOCATION' or contact a developer to update this script." >&2
     # 	exit 1
     # fi
-    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO '$MARIADB_USER'@'localhost' "
-    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO '$MARIADB_USER'@'localhost' "
-    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $AMELEX ; GRANT ALL PRIVILEGES ON $AMELEX.* TO '$MARIADB_USER'@'localhost' "
-    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $ARLEX ; GRANT ALL PRIVILEGES ON $ARLEX.* TO '$MARIADB_USER'@'localhost' "
+    sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO '$MARIADB_USER'@'localhost' "
+    sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO '$MARIADB_USER'@'localhost' "
+    sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $AMELEX ; GRANT ALL PRIVILEGES ON $AMELEX.* TO '$MARIADB_USER'@'localhost' "
+    sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $ARLEX ; GRANT ALL PRIVILEGES ON $ARLEX.* TO '$MARIADB_USER'@'localhost' "
 fi
 
 

@@ -28,7 +28,7 @@ func runInitTests(s *http.Server, port string) error {
 
 	time.Sleep(time.Second * 2) // TODO: This is not beautiful...
 
-	log.Printf("init_tests: server up and running using port " + port)
+	log.Printf("init_tests: server up and running using port %s", port)
 	log.Println("init_tests: running tests")
 
 	nErrs1, nTests1, err1 := testExampleURLs(port)
