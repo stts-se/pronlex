@@ -5,6 +5,7 @@ package dbapi
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -27,14 +28,14 @@ func processChunk(dbif DBIF, db *sql.DB, chunk []int64, vd validation.Validator,
 				msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
 			}
 		}
-		return stats, fmt.Errorf(msg)
+		return stats, errors.New(msg)
 	}
 	defer tx.Commit()
 
 	err = dbif.lookUp(db, []lex.LexName{}, q, &w)
 	if err != nil {
 		msg := fmt.Sprintf("couldn't lookup from ids : %v", err)
-		return stats, fmt.Errorf(msg)
+		return stats, errors.New(msg)
 	}
 	if w.Size() != len(chunk) {
 		msg := fmt.Sprintf("got %d input ids, but found %d entries", len(chunk), w.Size())
@@ -43,7 +44,7 @@ func processChunk(dbif DBIF, db *sql.DB, chunk []int64, vd validation.Validator,
 			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
 		}
 
-		return stats, fmt.Errorf(msg)
+		return stats, errors.New(msg)
 	}
 
 	validated, _ := vd.ValidateEntries(w.Entries)
@@ -79,7 +80,7 @@ func processChunk(dbif DBIF, db *sql.DB, chunk []int64, vd validation.Validator,
 			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
 		}
 
-		return stats, fmt.Errorf(msg)
+		return stats, errors.New(msg)
 	}
 	err = tx.Commit()
 	if err != nil {
@@ -88,7 +89,7 @@ func processChunk(dbif DBIF, db *sql.DB, chunk []int64, vd validation.Validator,
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : failed rollback : %v", msg, err2)
 		}
-		return stats, fmt.Errorf(msg)
+		return stats, errors.New(msg)
 	}
 
 	return stats, nil

@@ -1,6 +1,6 @@
 module github.com/stts-se/pronlex
 
-go 1.19
+go 1.24
 
 require (
 	github.com/dlclark/regexp2 v1.11.5

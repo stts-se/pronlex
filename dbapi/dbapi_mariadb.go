@@ -11,6 +11,7 @@ package dbapi
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -99,7 +100,7 @@ func (mdb mariaDBIF) getSchemaVersionTx(tx *sql.Tx) (string, error) {
 		}
 
 		log.Println(msg)
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	return res, nil
@@ -204,7 +205,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	if !lexExists {
 		return fmt.Errorf("dbapi.DeleteLexiconTx : no lexicon exists with name : %s", lexName)
@@ -220,7 +221,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 		return err
 	}
 	if n > 0 {
-		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: " + strconv.Itoa(n) + ")")
+		return fmt.Errorf("delete all its entries before deleting a lexicon (number of entries: %s)", strconv.Itoa(n))
 	}
 
 	_, err = tx.Exec("delete from Lexicon where name = ?", lexName)
@@ -232,7 +233,7 @@ func deleteLexiconTx(tx *sql.Tx, lexName string) error {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	return nil
 }
@@ -279,7 +280,7 @@ func lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 		}
 
-// 		return fmt.Errorf(msg)
+// 		return errors.New(msg)
 // 	}
 // 	if !lexExists {
 // 		return fmt.Errorf("dbapi.SuperDeleteLexiconTx : no lexicon exists with name : %s", lexName)
@@ -293,7 +294,7 @@ func lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 		if err2 != nil {
 // 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 		}
-// 		return fmt.Errorf(msg)
+// 		return errors.New(msg)
 // 	}
 // 	log.Println("dbapi.superDeleteLexiconTX finished deleting from entry set")
 
@@ -307,7 +308,7 @@ func lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 // 		}
 
-// 		return fmt.Errorf(msg)
+// 		return errors.New(msg)
 // 	}
 
 // 	log.Println("dbapi.superDeleteLexiconTX finished deleting from lexicon set")
@@ -317,8 +318,8 @@ func lexiconExists(tx *sql.Tx, lexName string) (bool, error) {
 // 	return nil
 // }
 
-//TODO: Check that lexName exists, or report error
-//TODO: Check that entryId exists, or report error
+// TODO: Check that lexName exists, or report error
+// TODO: Check that entryId exists, or report error
 func (mdb mariaDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int64, error) {
 	tx, err := db.Begin()
 	if err != nil {
@@ -329,7 +330,7 @@ func (mdb mariaDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 	defer tx.Commit()
 
@@ -343,7 +344,7 @@ func (mdb mariaDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 
 	res, err := tx.Exec("DELETE FROM Entry WHERE  id = ? AND lexiconId IN (SELECT id FROM Lexicon WHERE name = ?)", entryID, lexName)
@@ -355,7 +356,7 @@ func (mdb mariaDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 
 	i, err := res.RowsAffected()
@@ -367,7 +368,7 @@ func (mdb mariaDBIF) deleteEntry(db *sql.DB, entryID int64, lexName string) (int
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return 0, fmt.Errorf(msg)
+		return 0, errors.New(msg)
 	}
 
 	// No db error, entry id or lexicon name may be wrong
@@ -405,7 +406,7 @@ func defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 	if strings.TrimSpace(l.symbolSetName) == "" {
 		msg := fmt.Sprintf("failed to define lexicon with empty symbolSetName : %v", l)
@@ -415,7 +416,7 @@ func defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 
 	res, err := tx.Exec("insert into Lexicon (name, symbolsetname, locale) values (?, ?, ?)", strings.ToLower(l.name), l.symbolSetName, l.locale)
@@ -426,7 +427,7 @@ func defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 
 	id, err := res.LastInsertId()
@@ -438,7 +439,7 @@ func defineLexiconTx(tx *sql.Tx, l lexicon) (lexicon, error) {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return l, fmt.Errorf(msg)
+		return l, errors.New(msg)
 	}
 
 	//tx.Commit()
@@ -468,11 +469,11 @@ type MoveResult struct {
 func (mdb mariaDBIF) moveNewEntries(db *sql.DB, fromLexicon, toLexicon, newSource, newStatus string) (MoveResult, error) {
 	if strings.TrimSpace(newSource) == "" {
 		msg := "MoveNewEntries called with the empty 'newSource' argument"
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 	if strings.TrimSpace(newStatus) == "" {
 		msg := "MoveNewEntries called with the empty 'newStatus' argument"
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 
 	tx, err := db.Begin()
@@ -493,7 +494,7 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 	if strings.TrimSpace(newStatus) == "" {
 		msg := "moveNewEntriesTx called with the empty 'newStatus' argument"
@@ -502,7 +503,7 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return MoveResult{}, fmt.Errorf(msg)
+		return MoveResult{}, errors.New(msg)
 	}
 
 	res := MoveResult{}
@@ -515,7 +516,7 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	toLex, err := mdb.getLexiconTx(tx, toLexicon)
 	if err != nil {
@@ -525,7 +526,7 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	const where = `WHERE Entry.id IN (SELECT a.id FROM (select * from Entry) AS a WHERE a.lexiconId = ?
@@ -543,7 +544,7 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	//_ = q0Rez
@@ -560,7 +561,7 @@ func (mdb mariaDBIF) moveNewEntriesTx(tx *sql.Tx, fromLexicon, toLexicon, newSou
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	//TODO Should this result in an error and rollback?
@@ -614,7 +615,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 		// convert 'Preferred' into DB integer value
 		var pref int64
@@ -632,7 +633,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 				if err2 != nil {
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -651,7 +652,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 
 		id, err := res.LastInsertId()
@@ -662,7 +663,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 		// We want thelex.Entry to have the right id for inserting lemma assocs below
 		e.ID = id
@@ -680,7 +681,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -695,7 +696,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 			err = mdb.associateLemma2Entry(tx, lemma, e)
 			if err != nil {
@@ -705,7 +706,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -718,7 +719,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -739,7 +740,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return ids, fmt.Errorf(msg)
+				return ids, errors.New(msg)
 			}
 		}
 
@@ -751,7 +752,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 
 		err = mdb.insertEntryComments(tx, e.ID, e.Comments)
@@ -763,7 +764,7 @@ func (mdb mariaDBIF) insertEntries(db *sql.DB, l lexicon, es []lex.Entry) ([]int
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return ids, fmt.Errorf(msg)
+			return ids, errors.New(msg)
 		}
 
 	}
@@ -784,9 +785,9 @@ var insertEntryTagMDB = "INSERT INTO EntryTag (entryId, tag, wordForm) values (?
 
 //TODO Add tests
 
-//TODO Add db look-up to see if db uniqueness constraints are
-//violated, to return more gentle error (or no error) instead of
-//failing and rolling back.
+// TODO Add db look-up to see if db uniqueness constraints are
+// violated, to return more gentle error (or no error) instead of
+// failing and rolling back.
 func (mdb mariaDBIF) insertEntryTagTx(tx *sql.Tx, entryID int64, tag string, wordForm string) error {
 
 	tag = strings.TrimSpace(strings.ToLower(tag))
@@ -909,7 +910,7 @@ func (mdb mariaDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return result, fmt.Errorf(msg)
+		return result, errors.New(msg)
 	}
 	defer rows.Close()
 
@@ -932,14 +933,14 @@ func (mdb mariaDBIF) lookUpIdsTx(tx *sql.Tx, lexNames []lex.LexName, q Query) ([
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return nil, fmt.Errorf(msg)
+		return nil, errors.New(msg)
 	}
 
 	return result, nil
 }
 
 // LookUp takes a Query struct, searches the lexicon db, and writes the result to the
-//lex.EntryWriter.
+// lex.EntryWriter.
 func (mdb mariaDBIF) lookUp(db *sql.DB, lexNames []lex.LexName, q Query, out lex.EntryWriter) error {
 	//log.Printf("dbapi lookUp QUWRY %#v\n\n", q)
 	if q.Empty() {
@@ -962,7 +963,7 @@ func (mdb mariaDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	lexiconMap, err := mdb.getLexiconMapTx(tx)
@@ -974,7 +975,7 @@ func (mdb mariaDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	for _, lexName := range lexNames {
 		_, ok := lexiconMap[string(lexName)]
@@ -985,7 +986,7 @@ func (mdb mariaDBIF) validateInputLexicons(tx *sql.Tx, lexNames []lex.LexName, q
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return fmt.Errorf(msg)
+			return errors.New(msg)
 		}
 	}
 	return nil
@@ -1021,7 +1022,7 @@ func (mdb mariaDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out l
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	defer rows.Close()
 
@@ -1248,7 +1249,7 @@ func (mdb mariaDBIF) lookUpTx(tx *sql.Tx, lexNames []lex.LexName, q Query, out l
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	return nil
@@ -1314,7 +1315,7 @@ func (mdb mariaDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, update
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 		}
-		return res, updated, fmt.Errorf(msg)
+		return res, updated, errors.New(msg)
 	}
 	defer tx.Commit()
 
@@ -1325,7 +1326,7 @@ func (mdb mariaDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, update
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, updated, fmt.Errorf(msg)
+		return res, updated, errors.New(msg)
 	}
 	err = tx.Commit()
 	if err != nil {
@@ -1340,7 +1341,7 @@ func (mdb mariaDBIF) updateEntry(db *sql.DB, e lex.Entry) (res lex.Entry, update
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
 
-		return res, updated, fmt.Errorf(msg)
+		return res, updated, errors.New(msg)
 	}
 	return res, updated, err
 }
@@ -1449,7 +1450,7 @@ func (mdb mariaDBIF) updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.Language == dbE.Language {
 		return false, nil
@@ -1461,7 +1462,7 @@ func (mdb mariaDBIF) updateLanguage(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1473,7 +1474,7 @@ func (mdb mariaDBIF) updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) 
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.PartOfSpeech == dbE.PartOfSpeech {
 		return false, nil
@@ -1485,7 +1486,7 @@ func (mdb mariaDBIF) updatePartOfSpeech(tx *sql.Tx, e lex.Entry, dbE lex.Entry) 
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1497,7 +1498,7 @@ func (mdb mariaDBIF) updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.Morphology == dbE.Morphology {
 		return false, nil
@@ -1509,7 +1510,7 @@ func (mdb mariaDBIF) updateMorphology(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (b
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1521,7 +1522,7 @@ func (mdb mariaDBIF) updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.WordParts == dbE.WordParts {
 		return false, nil
@@ -1533,7 +1534,7 @@ func (mdb mariaDBIF) updateWordParts(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1545,7 +1546,7 @@ func (mdb mariaDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if e.Preferred == dbE.Preferred {
 		return false, nil
@@ -1567,7 +1568,7 @@ func (mdb mariaDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 	_, err := tx.Exec("update Entry set preferred = ? where Entry.id = ?", pref, e.ID)
@@ -1577,7 +1578,7 @@ func (mdb mariaDBIF) updatePreferred(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (bo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1596,7 +1597,7 @@ func (mdb mariaDBIF) updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (update
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 	// Only one alternative left, to update old lemma with new values
@@ -1607,7 +1608,7 @@ func (mdb mariaDBIF) updateLemma(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (update
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	return true, nil
 }
@@ -1621,7 +1622,7 @@ func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	newTag := strings.TrimSpace(strings.ToLower(e.Tag))
@@ -1644,7 +1645,7 @@ func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 		return true, nil
 	}
@@ -1656,7 +1657,7 @@ func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	rows, err := sqlRes.RowsAffected()
 	if err != nil {
@@ -1665,7 +1666,7 @@ func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 	if rows == 0 {
 		_, err := tx.Exec("INSERT into EntryTag (tag, entryId, wordForm) values (?, ?, ?)", newTag, e.ID, e.Strn)
@@ -1675,7 +1676,7 @@ func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 
@@ -1691,7 +1692,7 @@ func (mdb mariaDBIF) updateEntryTag(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (boo
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	return true, nil
@@ -1755,7 +1756,7 @@ func (mdb mariaDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 		for _, t := range e.Transcriptions {
 			_, err := tx.Exec(transSTMTMDB, e.ID, t.Strn, t.Language, t.SourcesString())
@@ -1766,7 +1767,7 @@ func (mdb mariaDBIF) updateTranscriptions(tx *sql.Tx, e lex.Entry, dbE lex.Entry
 					msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 				}
 
-				return false, fmt.Errorf(msg)
+				return false, errors.New(msg)
 			}
 		}
 		// different sets of transcription, new ones inserted
@@ -1797,7 +1798,7 @@ func (mdb mariaDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 
 		_, err = tx.Exec(insertStatusMDB, dbE.ID, strings.ToLower(e.EntryStatus.Name), strings.ToLower(e.EntryStatus.Source))
@@ -1807,7 +1808,7 @@ func (mdb mariaDBIF) updateEntryStatus(tx *sql.Tx, e lex.Entry, dbE lex.Entry) (
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 
 		return true, nil
@@ -1862,7 +1863,7 @@ func (mdb mariaDBIF) insertEntryValidations(tx *sql.Tx, e lex.Entry, eValis []le
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return fmt.Errorf(msg)
+			return errors.New(msg)
 		}
 	}
 	return nil
@@ -1878,7 +1879,7 @@ func (mdb mariaDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	defer tx.Commit()
 
@@ -1889,7 +1890,7 @@ func (mdb mariaDBIF) updateValidation(db *sql.DB, entries []lex.Entry) error {
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	err = tx.Commit()
 	if err != nil {
@@ -1917,7 +1918,7 @@ func (mdb mariaDBIF) updateEntryValidationForce(tx *sql.Tx, e lex.Entry) (bool, 
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	err = mdb.insertEntryValidations(tx, e, e.EntryValidations)
@@ -1947,7 +1948,7 @@ func (mdb mariaDBIF) updateEntryValidation(tx *sql.Tx, e lex.Entry, dbE lex.Entr
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return false, fmt.Errorf(msg)
+			return false, errors.New(msg)
 		}
 	}
 
@@ -1968,7 +1969,7 @@ func (mdb mariaDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 
 	for _, cmt := range eComments {
@@ -1979,7 +1980,7 @@ func (mdb mariaDBIF) insertEntryComments(tx *sql.Tx, eID int64, eComments []lex.
 			if err2 != nil {
 				msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 			}
-			return fmt.Errorf(msg)
+			return errors.New(msg)
 		}
 
 	}
@@ -2077,7 +2078,7 @@ func (mdb mariaDBIF) listEntryStatuses(db *sql.DB, lexiconName string, onlyCurre
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2119,7 +2120,7 @@ func (mdb mariaDBIF) listEntryStatusesWithFreq(db *sql.DB, lexiconName string, o
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2160,7 +2161,7 @@ func (mdb mariaDBIF) listEntryUsersWithFreq(db *sql.DB, lexiconName string, only
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2201,7 +2202,7 @@ func (mdb mariaDBIF) listEntryUsers(db *sql.DB, lexiconName string, onlyCurrent 
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2236,7 +2237,7 @@ func (mdb mariaDBIF) listCommentLabels(db *sql.DB, lexiconName string) ([]string
 		if err2 != nil {
 			msg = fmt.Sprintf("%s : rollback failed : %v", msg, err2)
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -2420,7 +2421,7 @@ func (mdb mariaDBIF) validationStatsTx(tx *sql.Tx, lexiconID int64) (ValStats, e
 // 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 // 			}
 // 		}
-// 		return false, fmt.Errorf(msg)
+// 		return false, errors.New(msg)
 // 	}
 
 // 	defer db.Close()
@@ -2470,7 +2471,7 @@ func (mdb mariaDBIF) listLexiconDatabases(dbLocation string) ([]lex.DBRef, error
 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 			}
 		}
-		return res, fmt.Errorf(msg)
+		return res, errors.New(msg)
 	}
 
 	defer db.Close()
@@ -2535,7 +2536,7 @@ func (mdb mariaDBIF) dropDB(dbLocation string, dbRef lex.DBRef) error {
 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 			}
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	defer db.Close()
 
@@ -2557,7 +2558,7 @@ func (mdb mariaDBIF) openDB(dbLocation string, dbRef lex.DBRef) (*sql.DB, error)
 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 			}
 		}
-		return db, fmt.Errorf(msg)
+		return db, errors.New(msg)
 	}
 	return db, nil
 }
@@ -2574,7 +2575,7 @@ func (mdb mariaDBIF) defineDB(dbLocation string, dbRef lex.DBRef) error {
 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 			}
 		}
-		return fmt.Errorf(msg)
+		return errors.New(msg)
 	}
 	defer db.Close()
 
@@ -2603,7 +2604,7 @@ func (mdb mariaDBIF) dbExists(dbLocation string, dbRef lex.DBRef) (bool, error) 
 				msg = fmt.Sprintf("%s : failed to close db : %v", msg, err2)
 			}
 		}
-		return false, fmt.Errorf(msg)
+		return false, errors.New(msg)
 	}
 
 	defer db.Close()
