@@ -137,7 +137,7 @@ func NewFormat(name string, fieldSep string, fields map[Field]int, nFields int, 
 		if err != nil {
 			errs = append(errs, fmt.Sprintf("%v", err))
 		} else if lineRes != t.OutputLine {
-			errs = append(errs, fmt.Sprintf("Format.String: expected %v, found %v", t.OutputLine, lineRes))
+			errs = append(errs, fmt.Sprintf("Format.String: expected <%v>, found <%v>", t.OutputLine, lineRes))
 		}
 	}
 	if len(errs) > 0 {

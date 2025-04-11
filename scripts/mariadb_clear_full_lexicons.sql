@@ -1,0 +1,4 @@
+DROP DATABASE IF EXISTS no_nob_nst_lex;
+DROP DATABASE IF EXISTS sv_se_nst_lex;
+DROP DATABASE IF EXISTS ar_ar_tst_lex;
+DROP DATABASE IF EXISTS en_am_cmu_lex;

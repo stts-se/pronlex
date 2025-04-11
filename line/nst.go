@@ -79,10 +79,11 @@ func appendTrans(ts []lex.Transcription, trans string, lang string, source strin
 
 func getTranses(fs map[Field]string) []lex.Transcription {
 	var res []lex.Transcription
-	res = appendTrans(res, fs[Trans1], fs[Translang1], fs[StatusSource])
-	res = appendTrans(res, fs[Trans2], fs[Translang2], fs[StatusSource])
-	res = appendTrans(res, fs[Trans3], fs[Translang3], fs[StatusSource])
-	res = appendTrans(res, fs[Trans4], fs[Translang4], fs[StatusSource])
+	statusSource := fs[StatusSource]
+	res = appendTrans(res, fs[Trans1], fs[Translang1], statusSource)
+	res = appendTrans(res, fs[Trans2], fs[Translang2], statusSource)
+	res = appendTrans(res, fs[Trans3], fs[Translang3], statusSource)
+	res = appendTrans(res, fs[Trans4], fs[Translang4], statusSource)
 	return res
 }
 

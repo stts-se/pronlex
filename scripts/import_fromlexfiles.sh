@@ -137,6 +137,7 @@ mkdir -p $APPDIR/symbol_sets || exit 1
 ### LEXDATA IMPORT
 
 SVLEX=sv_se_nst_lex
+SVLEXBRAXEN=sv_se_braxen_lex
 NOBLEX=no_nob_nst_lex
 AMELEX=en_am_cmu_lex
 ARLEX=ar_ar_tst_lex
@@ -169,6 +170,10 @@ function parse_MariaDB_DSN() {
 }
 
 if [ $DBENGINE == "sqlite" ]; then
+    if [ -e $APPDIR/${SVLEXBRAXEN}.db ]; then
+	echo "[$CMD] cannot create db if it already exists: $SVLEXBRAXEN" >&2
+	exit 1
+    fi
     if [ -e $APPDIR/${SVLEX}.db ]; then
 	echo "[$CMD] cannot create db if it already exists: $SVLEX" >&2
 	exit 1
@@ -192,6 +197,8 @@ elif [ $DBENGINE == "mariadb" ]; then
     # 	echo "[$CMD] Not not implemented for $DBENGINE location '$DBLOCATION'. Please use '$DEFAULT_MARIADB_LOCATION' or contact a developer to update this script." >&2
     # 	exit 1
     # fi
+    sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $SVLEXBRAXEN ; GRANT ALL PRIVILEGES ON $SVLEXBRAXEN.* TO '$MARIADB_USER'@'localhost' "
+    echo "svej"    
     sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST -u root --port $MARIADB_PORT -e "create database $AMELEX ; GRANT ALL PRIVILEGES ON $AMELEX.* TO '$MARIADB_USER'@'localhost' "
@@ -200,7 +207,7 @@ fi
 
 
 ### COPY REQUIRED FILES
-cp $LEXDATA/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
+cp --backup=numbered $LEXDATA/*/*/*.sym $APPDIR/symbol_sets/ || exit 1
 echo "" >> $APPDIR/symbol_sets/mappers.txt || exit 1
 cat $LEXDATA/mappers.txt >> $APPDIR/symbol_sets/mappers.txt || exit 1
 cp $LEXDATA/converters/*.cnv $APPDIR/symbol_sets/ || exit 1
@@ -229,7 +236,7 @@ function import_file() {
     ssFile=$5
 
     if run_go_command createEmptyDB -db_engine $DBENGINE -db_location $DBLOCATION -db_name $dbName; then
-	if run_go_command importLex -db_engine $DBENGINE -db_name $dbName -db_location $DBLOCATION -lex_file $lexFile -lex_name $lexName -locale $locale -symbolset $ssFile; then
+	if run_go_command importLex -createlex -db_engine $DBENGINE -db_name $dbName -db_location $DBLOCATION -lex_file $lexFile -lex_name $lexName -locale $locale -symbolset $ssFile; then
 	    echo -n ""
 	else
 	    echo "$dbName FAILED" >&2
@@ -240,6 +247,10 @@ function import_file() {
 	exit 1
     fi
 }
+
+echo "" >&2
+echo "IMPORT: $SVLEXBRAXEN" >&2
+import_file $SVLEXBRAXEN sv-se.braxen sv_SE $LEXDATA/sv-se/braxen/braxen-sv-ws.gz $APPDIR/symbol_sets/sv-se_ws-sampa.sym 
 
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
