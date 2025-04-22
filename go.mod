@@ -11,7 +11,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/stts-se/rbg2p v1.1.0
 	github.com/stts-se/symbolset v0.0.0-20250225114554-736215deea47
-	golang.org/x/net v0.38.0
+	golang.org/x/net v0.39.0
 	golang.org/x/text v0.24.0
 )
 
