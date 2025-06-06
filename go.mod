@@ -11,8 +11,8 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/stts-se/rbg2p v1.1.0
 	github.com/stts-se/symbolset v0.0.0-20250225114554-736215deea47
-	golang.org/x/net v0.40.0
-	golang.org/x/text v0.25.0
+	golang.org/x/net v0.41.0
+	golang.org/x/text v0.26.0
 )
 
 require filippo.io/edwards25519 v1.1.0 // indirect
