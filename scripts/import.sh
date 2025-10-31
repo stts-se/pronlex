@@ -254,7 +254,7 @@ function import_sql() {
 
 echo "" >&2
 echo "IMPORT: $SVLEXBRAXEN" >&2
-import_sql $SVLEXBRAXEN $LEXDATA/sv-se/braxen/swe030224NST.pron-ws.utf8
+import_sql $SVLEXBRAXEN $LEXDATA/sv-se/braxen/braxen-sv-ws
 
 echo "" >&2
 echo "IMPORT: $SVLEX" >&2
