@@ -19,7 +19,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 2. Set up `go`
 
-     Download: https://golang.org/dl/ (1.13 or higher)   
+     Download: https://golang.org/dl/ (1.24 or higher)   
      Installation instructions: https://golang.org/doc/install             
 
 
