@@ -103,7 +103,11 @@ You can create your own lexicon files, or you can use existing data in the [wiki
 
 The server is started using this script:
 
-`pronlex$ bash scripts/start_server.sh -e <db engine> -l <db location> -a <application folder>`
+`pronlex$ bash scripts/start_server.sh -e <db engine> -l <db location>* -a <application folder>`
+
+Example: 
+
+`pronlex$ bash scripts/start_server.sh -e sqlite -a ~/wikispeech/sqlite/`
 
 The startup script will run some init tests in a separate test server, before starting the standard server.
 
