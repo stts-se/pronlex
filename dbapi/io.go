@@ -164,16 +164,15 @@ func importLexiconFile(dbif DBIF, db *sql.DB, lexiconName lex.LexName, logger Lo
 
 	logger.Write("Finalizing import ... ")
 
-	// An administrator could call analyze but it's not part of the import function... So I'm removing this 2020-04-16 /HL
 	// NB. Syntax below is for sqlite, the syntax for mariadb is different
-	// if dbif.engine() == Sqlite {
-	// 	_, err = db.Exec("ANALYZE")
-	// 	if err != nil {
-	// 		var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
-	// 		logger.Write(msg)
-	// 		return fmt.Errorf("%v", msg)
-	// 	}
-	// }
+	if dbif.engine() == Sqlite {
+		_, err = db.Exec("ANALYZE")
+		if err != nil {
+			var msg = fmt.Sprintf("failed to exec analyze cmd to db : %v", err)
+			logger.Write(msg)
+			return fmt.Errorf("%v", msg)
+		}
+	}
 
 	msg3 := fmt.Sprintf("Lines read:      %d", nTotal)
 	logger.Write(msg3)
