@@ -35,11 +35,11 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `$ git clone https://github.com/stts-se/pronlex.git`  
    `$ cd pronlex`   
    
-4. Set up mariadb (optional, but required for unit tests to pass)
+4. Set up MariaDB (optional, but required for unit tests to pass)
 
    `sudo mysql -u root < scripts/mariadb_setup.sql`
 
-6. Test (optional)
+6. Test (optional, required MariaDB setup)
 
    `pronlex$ go test ./...`
 
