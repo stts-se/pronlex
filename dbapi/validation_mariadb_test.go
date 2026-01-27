@@ -163,6 +163,10 @@ func vInsertEntriesMariadb(t *testing.T, lexName string) (*sql.DB, string) {
 }
 
 func Test_Validation1Mariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	db, lexName := vInsertEntriesMariadb(t, "test1")
 	v := createValidatorMariadbTest()
 
@@ -217,6 +221,10 @@ func Test_Validation1Mariadb(t *testing.T) {
 }
 
 func Test_Validation2Mariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	db, lexName := vInsertEntriesMariadb(t, "test2")
 	v := createValidatorMariadbTest()
 
@@ -307,6 +315,10 @@ func Test_Validation2Mariadb(t *testing.T) {
 }
 
 func Test_ValidationUpdate1Mariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	db, lexName := vInsertEntriesMariadb(t, "test3")
 	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
@@ -344,6 +356,10 @@ func Test_ValidationUpdate1Mariadb(t *testing.T) {
 }
 
 func Test_ValidationUpdate2Mariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	db, lexName := vInsertEntriesMariadb(t, "test4")
 	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}
@@ -383,6 +399,10 @@ func Test_ValidationUpdate2Mariadb(t *testing.T) {
 }
 
 func Test_ValidationUpdate3Mariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	db, lexName := vInsertEntriesMariadb(t, "test5")
 	v := createValidatorMariadbTest()
 	ew := lex.EntrySliceWriter{}

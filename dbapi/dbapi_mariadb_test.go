@@ -2,7 +2,7 @@ package dbapi
 
 import (
 	"database/sql"
-	//"flag"
+	"flag"
 	//"fmt"
 	"reflect"
 	"time"
@@ -19,6 +19,8 @@ import (
 
 // Set up for local testing, run:
 // $ sudo mysql -u root < scripts/mariadb_setup.sql
+
+var WithMariaDB = flag.Bool("mariadb", false, "Use this flag to inhibit MariaDB tests")
 
 // ff is a place holder to be replaced by proper error handling
 func ff(f string, err error) {
@@ -52,6 +54,10 @@ func execSchemaMariadb(db *sql.DB) (sql.Result, error) {
 }
 
 func Test_insertEntries(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_test1")
 	if err != nil {
@@ -539,6 +545,10 @@ func Test_insertEntries(t *testing.T) {
 }
 
 func TestMariadbUnique(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	in := []int64{1, 2, 3}
 
 	res := unique(in)
@@ -558,6 +568,10 @@ func TestMariadbUnique(t *testing.T) {
 }
 
 func TestMariadbImportLexiconFile(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -653,6 +667,10 @@ func TestMariadbImportLexiconFile(t *testing.T) {
 }
 
 func Test_ImportLexiconFileWithDupLines(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -753,6 +771,10 @@ func Test_ImportLexiconFileWithDupLines(t *testing.T) {
 }
 
 func Test_ImportLexiconFileInvalid(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -806,6 +828,10 @@ func Test_ImportLexiconFileInvalid(t *testing.T) {
 }
 
 func Test_ImportLexiconFileGz(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -901,6 +927,10 @@ func Test_ImportLexiconFileGz(t *testing.T) {
 
 /*
 func Test_ImportLexiconBigFileGz(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
 	if err != nil {
@@ -993,101 +1023,109 @@ func Test_ImportLexiconBigFileGz(t *testing.T) {
 */
 
 /*
-func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
+	func Test_ImportLexiconBigFileGzPostTest(t *testing.T) {
+		if !*WithMariaDB {
+			t.Skip("skipping test for mariadb")
+			return
+		}
 
-	symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
-	if err != nil {
-		log.Fatal(err)
-	}
+		symbolSet, err := symbolset.LoadSymbolSet("./test_data/sv-se_ws-sampa.sym")
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	// dbFile := "./iotestlex.db"
-	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
-	// 	err := os.Remove(dbFile)
-	// 	ff("failed to remove iotestlex.db : %v", err)
-	// }
+		// dbFile := "./iotestlex.db"
+		// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		// 	err := os.Remove(dbFile)
+		// 	ff("failed to remove iotestlex.db : %v", err)
+		// }
 
-	// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+		// db, err := sql.Open("sqlite3_with_regexp", "./iotestlex.db")
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
-	// _, err = db.Exec("PRAGMA foreign_keys = ON")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
-	// ff("Failed to exec PRAGMA call %v", err)
+		// _, err = db.Exec("PRAGMA foreign_keys = ON")
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// _, err = db.Exec("PRAGMA case_sensitive_like=ON")
+		// ff("Failed to exec PRAGMA call %v", err)
 
-	db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_sv_nst")
-	if err != nil {
-		log.Fatal(err)
-	}
+		db, err := sql.Open("mysql", "speechoid:@tcp(127.0.0.1:3306)/wikispeech_pronlex_sv_nst")
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	defer db.Close()
+		defer db.Close()
 
-	// _, err = execSchemaMariadb(db) // Creates new lexicon database
-	// ff("Failed to create lexicon db: %v", err)
+		// _, err = execSchemaMariadb(db) // Creates new lexicon database
+		// ff("Failed to create lexicon db: %v", err)
 
-	// logger := StderrLogger{}
-	l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
+		// logger := StderrLogger{}
+		l := lexicon{name: "test", symbolSetName: symbolSet.Name, locale: "ll"}
 
-	// l, err = defineLexicon(db, l)
-	// if err != nil {
-	// 	t.Errorf(fs, nil, err)
-	// }
+		// l, err = defineLexicon(db, l)
+		// if err != nil {
+		// 	t.Errorf(fs, nil, err)
+		// }
 
-	// // actual tests start here
-	// err = ImportMariaDBLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/wikispeech-lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
-	// if err != nil {
-	// 	t.Errorf(fs, nil, err)
-	// }
+		// // actual tests start here
+		// err = ImportMariaDBLexiconFile(db, lex.LexName(l.name), logger, "/home/nikolaj/gitrepos/wikispeech-lexdata/sv-se/nst/swe030224NST.pron-ws.utf8.gz", &validation.Validator{})
+		// if err != nil {
+		// 	t.Errorf(fs, nil, err)
+		// }
 
-	q := Query{Words: []string{"sprängstoffet"}}
+		q := Query{Words: []string{"sprängstoffet"}}
 
-	res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
+		res, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+		if err != nil {
+			t.Errorf(fs, nil, err)
+		}
 
-	if len(res) != 1 {
-		t.Errorf(fs, "1", len(res))
-	}
-	o := res[0].Strn
-	if o != "sprängstoffet" {
-		t.Errorf(fs, "sprängstoffet", o)
-	}
+		if len(res) != 1 {
+			t.Errorf(fs, "1", len(res))
+		}
+		o := res[0].Strn
+		if o != "sprängstoffet" {
+			t.Errorf(fs, "sprängstoffet", o)
+		}
 
-	q = Query{Words: []string{"sittriktig"}}
-	res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
-	if err != nil {
-		t.Errorf(fs, nil, err)
-	}
-	if len(res) != 1 {
-		t.Errorf(fs, "1", len(res))
-	}
-	o = res[0].Strn
-	if o != "sittriktig" {
-		t.Errorf(fs, "sittriktig", o)
-	}
+		q = Query{Words: []string{"sittriktig"}}
+		res, err = lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+		if err != nil {
+			t.Errorf(fs, nil, err)
+		}
+		if len(res) != 1 {
+			t.Errorf(fs, "1", len(res))
+		}
+		o = res[0].Strn
+		if o != "sittriktig" {
+			t.Errorf(fs, "sittriktig", o)
+		}
 
-	// Doesn't work very well when you want to keep the big db...
+		// Doesn't work very well when you want to keep the big db...
 
-	//Let's throw in a test of deleteEntry as well:
-	// eX := res[0]
-	// deleteEntry(db, eX.ID, l.name)
+		//Let's throw in a test of deleteEntry as well:
+		// eX := res[0]
+		// deleteEntry(db, eX.ID, l.name)
 
-	// // Run same query again, efter deleting Entry
-	// resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
-	// if err != nil {
-	// 	t.Errorf(fs, nil, err)
-	// }
-	// if len(resX) != 0 {
-	// 	t.Errorf(fs, "0", len(res))
-	// }
+		// // Run same query again, efter deleting Entry
+		// resX, err := lookUpIntoSlice(db, []lex.LexName{lex.LexName(l.name)}, q)
+		// if err != nil {
+		// 	t.Errorf(fs, nil, err)
+		// }
+		// if len(resX) != 0 {
+		// 	t.Errorf(fs, "0", len(res))
+		// }
 
 }
 */
 func Test_UpdateComments(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	// dbPath := "./testlex_updatecomments.db"
 
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {
@@ -1185,6 +1223,10 @@ func Test_UpdateComments(t *testing.T) {
 }
 
 func Test_ValidationRuleLike(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 	// dbPath := "./testlex_validationrulelike.db"
 
 	// if _, err := os.Stat(dbPath); !os.IsNotExist(err) {

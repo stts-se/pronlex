@@ -11,6 +11,10 @@ import (
 )
 
 func Test_DBManagerMariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	// dbPath1 := "./testlex_listlex1.db"
 	// dbPath2 := "./testlex_listlex2.db"

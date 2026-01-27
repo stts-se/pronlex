@@ -11,6 +11,10 @@ import (
 )
 
 func Test_MoveNewEntriesMariadb(t *testing.T) {
+	if !*WithMariaDB {
+		t.Skip("skipping test for mariadb")
+		return
+	}
 
 	// dbFile := "./movetestlex.db"
 	// if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
