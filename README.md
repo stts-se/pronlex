@@ -30,18 +30,24 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    [MariaDB](https://mariadb.org/): On Linux systems with `apt`, run `sudo apt install mariadb-server` or similar (it should be version 10.1.3 or higher)
 
    Please note that you need to install both databases if you intend to run unit tests or other automated tests
+
 4. Clone the source code
 
    `$ git clone https://github.com/stts-se/pronlex.git`  
    `$ cd pronlex`   
    
-4. Set up MariaDB (optional, but required for unit tests to pass)
-
-   `sudo mysql -u root < scripts/mariadb_setup.sql`
-
-6. Test (optional, required MariaDB setup)
+5. Test (optional)
 
    `pronlex$ go test ./...`
+
+6. Set up MariaDB (optional)
+
+   ``` sh
+   sudo mysql -u root < scripts/mariadb_setup.sql`
+   cd dbapi
+   go test . -mariadb # run unit tests (optional)
+   ```
+
 
 
 ### II. Quick start: Create a lexicon database file and look up a word (for Sqlite configuration)
