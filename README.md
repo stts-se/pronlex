@@ -15,15 +15,17 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 1. Prerequisites
 
      If you're on Linux, you may need to install `gcc` and `build-essential` for the `sqlite3` go adapter to work properly:   
-     `$ sudo apt-get install gcc build-essential`
+     ``` sh
+   sudo apt-get install gcc build-essential
+     ```
 
-2. Set up `go`
+3. Set up `go`
 
      Download: https://golang.org/dl/ (1.24 or higher)   
      Installation instructions: https://golang.org/doc/install             
 
 
-3. Install database support
+4. Install database support
 
    [Sqlite3](https://www.sqlite.org/): On Linux systems with `apt`, run `sudo apt install sqlite3`
 
@@ -31,10 +33,10 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
    Please note that you need to install both databases if you intend to run unit tests or other automated tests
 
-4. Clone the source code
+5. Clone the source code
 
    ``` sh
-   git clone https://github.com/stts-se/pronlex.git`  
+   git clone https://github.com/stts-se/pronlex.git 
    cd pronlex
    ```   
    
@@ -47,7 +49,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 8. Set up MariaDB (optional)
 
    ``` sh
-   sudo mysql -u root < scripts/mariadb_setup.sql`
+   sudo mysql -u root < scripts/mariadb_setup.sql
    cd dbapi
    go test . -mariadb # run unit tests (optional)
    ```
