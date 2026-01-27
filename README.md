@@ -46,7 +46,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    go test ./...
    ```
 
-8. Set up MariaDB (optional)
+7. Set up MariaDB (optional)
 
    ``` sh
    sudo mysql -u root < scripts/mariadb_setup.sql
@@ -55,8 +55,77 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    ```
 
 
+### II. Server setup
 
-### II. Quick start: Create a lexicon database file and look up a word (for Sqlite configuration)
+1. Setup the pronlex server
+
+   `pronlex$ bash scripts/setup.sh -a <application folder> -e <db engine> -l <db location>*`   
+
+   Example:     
+   ``` sh
+   bash scripts/setup.sh -a ~/wikispeech/sqlite -e sqlite
+   ```
+   Usage info:      
+   ``` sh 
+   bash scripts/setup.sh -h
+   ```
+
+   Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
+
+   The application folder is where databases and other resources will be installed. It can be any folder of your choice.
+
+   If, for some reason, you are not using the above setup script to configure your pronlex installation, you need to configure mariadb using the mariadb setup script (as root):
+
+   ``` sh
+   sudo mysql -u root < scripts/mariadb_setup.sql
+   ```
+
+
+3. Import lexicon data (optional)
+
+   `pronlex$ bash scripts/import.sh -a <application folder> -e <db engine> -l <db location>* -f <lexdata git> `
+
+   Example:
+
+   ``` sh
+   bash scripts/import.sh -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/wikispeech-lexdata
+   ```
+
+   Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata) repository.
+If the `<lexdata git>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
+The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
+
+   If you want to import other lexicon data, or just a subset of the data above, you can use one of the following methods:
+   
+   * Import lexicon files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
+   * Import database sql dumps files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
+
+   You can create your own lexicon files, or you can use existing data in the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata) repository. The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
+
+
+### III. Start the lexicon server
+
+The server is started using this script:
+
+`pronlex$ bash scripts/start_server.sh -e <db engine> -l <db location>* -a <application folder>`
+
+Example: 
+
+``` sh
+bash scripts/start_server.sh -e sqlite -a ~/wikispeech/sqlite/
+```
+
+The startup script will run some init tests in a separate test server, before starting the standard server.
+
+When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
+
+For a complete set of options, run:  
+``` sh 
+bash scripts/start_server.sh -h
+```
+
+
+### IV. Advanced usage: Create a lexicon database file and look up a word (for Sqlite configuration)
 
 1) Download an SQL lexicon dump file. In the following example, we use a Swedish lexicon: `https://github.com/stts-se/wikispeech-lexdata/blob/master/sv-se/nst/swe030224NST.pron-ws.utf8.sqlite.sql.gz`
 
@@ -73,60 +142,6 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    `pronlex$ lexlookup -db_engine sqlite -db_location ~/wikispeech/sqlite/ -db_name sv_db -lexicon swe_lex åsna`
 
 
-### III. Server setup
-
-1. Setup the pronlex server:
-
-   `pronlex$ bash scripts/setup.sh -a <application folder> -e <db engine> -l <db location>*`   
-   Example:     
-   `pronlex$ bash scripts/setup.sh -a ~/wikispeech/sqlite -e sqlite`    
-   Usage info:      
-   `pronlex$ bash scripts/setup.sh -h`
-
-   Sets up the pronlex server using the specified database engine and specified location, and a set of test data. The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
-
-   The application folder is where databases and other resources will be installed. It can be any folder of your choice.
-
-   If, for some reason, you are not using the above setup script to configure your pronlex installation, you need to configure mariadb using the mariadb setup script (as root):
-
-   `sudo mysql -u root < scripts/mariadb_setup.sql`
-
-
-2. Import lexicon data (optional)
-
-   `pronlex$ bash scripts/import.sh -a <application folder> -e <db engine> -l <db location>* -f <lexdata git> `    
-   Example:      
-   `pronlex$ bash scripts/import.sh -a ~/wikispeech/sqlite -e sqlite -f ~/git_repos/wikispeech-lexdata`   
-
-   Imports lexicon databases (sql dumps) for Swedish, Norwegian, US English, and a small set of test data for Arabic from the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata) repository.
-If the `<lexdata git>` folder exists on disk, lexicon resources will be read from this folder. If it doesn't exist, the lexicon data will be downloaded from github.
-The db location folder is not required for sqlite (if it's not specified, the application folder will be used for db location).
-
-   If you want to import other lexicon data, or just a subset of the data above, you can use one of the following methods:
-   
-   * Import lexicon files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importLex.
-   * Import database sql dumps files from the command line: https://github.com/stts-se/pronlex/tree/master/cmd/lexio/importSql.
-
-
-You can create your own lexicon files, or you can use existing data in the [wikispeech-lexdata](https://github.com/stts-se/wikispeech-lexdata) repository. The lexicon file format is described here: https://godoc.org/github.com/stts-se/pronlex/line.
-
-
-### IV. Start the lexicon server
-
-The server is started using this script:
-
-`pronlex$ bash scripts/start_server.sh -e <db engine> -l <db location>* -a <application folder>`
-
-Example: 
-
-`pronlex$ bash scripts/start_server.sh -e sqlite -a ~/wikispeech/sqlite/`
-
-The startup script will run some init tests in a separate test server, before starting the standard server.
-
-When the standard (non-testing) server is started, it always creates a demo database and lexicon, containing a few simple entries for demo and testing purposes. The server can thus be started and tested even if you haven't imported the lexicon data above.
-
-For a complete set of options, run:  
-`pronlex$ bash scripts/start_server.sh -h`
 
 
 <!--
