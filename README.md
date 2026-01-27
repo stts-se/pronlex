@@ -33,14 +33,18 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
 
 4. Clone the source code
 
-   `$ git clone https://github.com/stts-se/pronlex.git`  
-   `$ cd pronlex`   
+   ``` sh
+   git clone https://github.com/stts-se/pronlex.git`  
+   cd pronlex
+   ```   
    
-5. Test (optional)
+6. Test (optional)
 
-   `pronlex$ go test ./...`
+   ```sh
+   go test ./...
+   ```
 
-6. Set up MariaDB (optional)
+8. Set up MariaDB (optional)
 
    ``` sh
    sudo mysql -u root < scripts/mariadb_setup.sql`
