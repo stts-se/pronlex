@@ -24,7 +24,7 @@ import (
 // 	},
 // }
 
-//var lexiconUpdateEntryURL = "/updateentry?entry={...}"
+// var lexiconUpdateEntryURL = "/updateentry?entry={...}"
 // TODO: Use a lexicon that exists!
 var lexiconUpdateEntryURL = `/updateentry?entry={
     "id": 9,
