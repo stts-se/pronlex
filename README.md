@@ -6,7 +6,6 @@ pronlex is a pronunciation lexicon database with a server behind a simple HTTP A
 [![Build Status](https://github.com/stts-se/pronlex/actions/workflows/build%20status.yml/badge.svg)](https://github.com/stts-se/pronlex/actions/workflows/build%20status.yml)
 
 
-
 ## Lexicon server / Installation instructions
 
 Utility scripts below (setup, import, start_server) require a working `bash` installation (preferably on a Linux system).

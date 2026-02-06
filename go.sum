@@ -12,8 +12,8 @@ github.com/mattn/go-sqlite3 v1.14.33 h1:A5blZ5ulQo2AtayQ9/limgHEkFreKj1Dv226a1K7
 github.com/mattn/go-sqlite3 v1.14.33/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
 github.com/stts-se/rbg2p v1.1.0 h1:l8dzEt6cjYNd/cVuTmcJAHHNQR7V8ESiFLZevS95bFk=
 github.com/stts-se/rbg2p v1.1.0/go.mod h1:BwWWksPg6F3beQKE7f11gi7J6xpAOVa4oFXLDCrVm6M=
-github.com/stts-se/symbolset v0.0.0-20260206120406-97aeaf74a8dd h1:U9YTrsWfU5lX9VkjwTJheIajfbpkRczssIKoe6kmKLw=
-github.com/stts-se/symbolset v0.0.0-20260206120406-97aeaf74a8dd/go.mod h1:+eCtUt/6/UwA6NUIuRpJq4BrAyAZ7ReA1W/R4nam514=
+github.com/stts-se/symbolset v0.0.0-20260206123505-2a5e13777cf9 h1:u9bZ12r6W4IM3TADsWmidoPjSWQqQTeb7kp/myuUV+M=
+github.com/stts-se/symbolset v0.0.0-20260206123505-2a5e13777cf9/go.mod h1:+eCtUt/6/UwA6NUIuRpJq4BrAyAZ7ReA1W/R4nam514=
 golang.org/x/net v0.49.0 h1:eeHFmOGUTtaaPSGNmjBKpbng9MulQsJURQUAfUwY++o=
 golang.org/x/net v0.49.0/go.mod h1:/ysNB2EvaqvesRkuLAyjI1ycPZlQHM3q01F02UY/MV8=
 golang.org/x/text v0.33.0 h1:B3njUFyqtHDUI5jMn1YIr5B0IE2U0qck04r6d4KPAxE=
