@@ -10,6 +10,7 @@ import (
 
 /*
 Result is a validation result with the following fields:
+
 	RuleName - arbitrary string
 	Level - typically indicating severity (e.g. Info/Warning/Fatal/Format/Severe)
 	Messages - arbitrary strings representing validation messages to the user

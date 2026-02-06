@@ -24,12 +24,16 @@ type LexRefWithInfo struct {
 	SymbolSetName string
 }
 
-/*ParseLexRef is used to parse a lexicon reference string into a LexRef struct
-    var fullLexName  = "pronlex:sv-se-nst"
-    var lexRef, _    = ParseLexRef(fullLexName)
-    // lexRef.DBRef  = pronlex
-    // lexRef.LexName = sv-se-nst
-**/
+/*
+ParseLexRef is used to parse a lexicon reference string into a LexRef struct
+
+	var fullLexName  = "pronlex:sv-se-nst"
+	var lexRef, _    = ParseLexRef(fullLexName)
+	// lexRef.DBRef  = pronlex
+	// lexRef.LexName = sv-se-nst
+
+*
+*/
 func ParseLexRef(fullLexName string) (LexRef, error) {
 	nameSplit := strings.SplitN(strings.TrimSpace(fullLexName), ":", 2)
 	if len(nameSplit) != 2 {
@@ -201,6 +205,7 @@ type EntryWriter interface {
 
 // EntryFileWriter outputs formated entries to an io.Writer.
 // Example usage:
+//
 //	bf := bufio.NewWriter(f)
 //	defer bf.Flush()
 //	bfx := lex.EntriesFileWriter{bf}
@@ -225,6 +230,7 @@ func (w *EntryFileWriter) Write(e Entry) error {
 
 // EntrySliceWriter is a container for returning Entries from a LookUp call to the db
 // Example usage:
+//
 //	var q := dbapi.Query{ ... }
 //	var esw lex.EntrySliceWriter
 //	err := dbapi.LookUp(db, q, &esw)

@@ -2,5 +2,4 @@
 //
 // To create a validating rule suite, initialize the Validator struct using a slice of Rule instances.
 // Use the Validator.Validate or ValidateEntry functions to have one or more entries validated. Implemented validators are found in sub package validation/validators.
-//
 package validation
