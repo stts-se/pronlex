@@ -31,22 +31,22 @@ const sqlitePath = "sqlite3"
 const mariaDBPath = "mysql"
 
 /*
-func sqlDump(dbFile string, outFile string) error {
-	sqliteCmd := exec.Command(sqlitePath, dbFile, ".dump")
-	out, err := os.Create(outFile)
-	if err != nil {
-		log.Fatalf("couldn't create output file %s : %v", outFile, err)
+	func sqlDump(dbFile string, outFile string) error {
+		sqliteCmd := exec.Command(sqlitePath, dbFile, ".dump")
+		out, err := os.Create(outFile)
+		if err != nil {
+			log.Fatalf("couldn't create output file %s : %v", outFile, err)
+		}
+		defer out.Close()
+		sqliteCmd.Stdout = out
+		sqliteCmd.Stderr = os.Stderr
+		err = sqliteCmd.Run()
+		if err != nil {
+			return err
+		}
+		log.Printf("Exported %s from db %s\n", dbFile, outFile)
+		return nil
 	}
-	defer out.Close()
-	sqliteCmd.Stdout = out
-	sqliteCmd.Stderr = os.Stderr
-	err = sqliteCmd.Run()
-	if err != nil {
-		return err
-	}
-	log.Printf("Exported %s from db %s\n", dbFile, outFile)
-	return nil
-}
 */
 var dotAndAfter = regexp.MustCompile("[.].*$")
 
