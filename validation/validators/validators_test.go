@@ -219,7 +219,7 @@ func TestWhitespace(t *testing.T) {
 		WordParts:    "banen",
 		Transcriptions: []lex.Transcription{
 			{
-				Strn:     "\" b A: . n @ n ",
+				Strn:     "\" b A: . n @ Ö ",
 				Language: "swe",
 			},
 		},
@@ -230,8 +230,12 @@ func TestWhitespace(t *testing.T) {
 
 	expect = []lex.EntryValidation{
 		{
+			RuleName: "syllabic",
+			Level:    "Format",
+			Message:  "[...]"},
+		{
 			RuleName: "SymbolSet",
-			Level:    "Fatal",
+			Level:    "fatal",
 			Message:  "[...]"},
 	}
 	if len(result) != len(expect) {
