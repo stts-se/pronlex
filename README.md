@@ -81,7 +81,7 @@ Utility scripts below (setup, import, start_server) require a working `bash` ins
    ```
 
 
-3. Import lexicon data (optional)
+3. Import lexicon data
 
    `pronlex$ bash scripts/import.sh -a <application folder> -e <db engine> -l <db location>* -f <lexdata git> `
 
