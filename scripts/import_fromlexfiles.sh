@@ -136,7 +136,7 @@ mkdir -p $APPDIR/symbol_sets || exit 1
 
 ### LEXDATA IMPORT
 
-SVLEX=sv_se_nst_lex
+#SVLEX=sv_se_nst_lex
 SVLEXBRAXEN=sv_se_braxen_lex
 NOBLEX=no_nob_nst_lex
 AMELEX=en_am_cmu_lex
@@ -181,10 +181,10 @@ if [ $DBENGINE == "sqlite" ]; then
 	echo "[$CMD] cannot create db if it already exists: $SVLEXBRAXEN" >&2
 	exit 1
     fi
-    if [ -e $APPDIR/${SVLEX}.db ]; then
-	echo "[$CMD] cannot create db if it already exists: $SVLEX" >&2
-	exit 1
-    fi
+    # if [ -e $APPDIR/${SVLEX}.db ]; then
+    # 	echo "[$CMD] cannot create db if it already exists: $SVLEX" >&2
+    # 	exit 1
+    # fi
     if [ -e $DBLOCATION/${NOBLEX}.db ]; then
 	echo "[$CMD] cannot create db if it already exists: $NOBLEX" >&2
 	exit 1
@@ -205,7 +205,7 @@ elif [ $DBENGINE == "mariadb" ]; then
     # 	exit 1
     # fi
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $SVLEXBRAXEN ; GRANT ALL PRIVILEGES ON $SVLEXBRAXEN.* TO '$MARIADB_USER'@'localhost' "
-    sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO '$MARIADB_USER'@'localhost' "
+    # sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $AMELEX ; GRANT ALL PRIVILEGES ON $AMELEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $ARLEX ; GRANT ALL PRIVILEGES ON $ARLEX.* TO '$MARIADB_USER'@'localhost' "
@@ -258,9 +258,9 @@ echo "" >&2
 echo "IMPORT: $SVLEXBRAXEN" >&2
 import_file $SVLEXBRAXEN sv-se.braxen sv_SE $LEXDATA/sv-se/braxen/braxen-sv-ws.gz $APPDIR/symbol_sets/sv-se_ws-sampa.sym 
 
-echo "" >&2
-echo "IMPORT: $SVLEX" >&2
-import_file $SVLEX sv-se.nst sv_SE $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.gz $APPDIR/symbol_sets/sv-se_ws-sampa.sym 
+# echo "" >&2
+# echo "IMPORT: $SVLEX" >&2
+# import_file $SVLEX sv-se.nst sv_SE $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8.gz $APPDIR/symbol_sets/sv-se_ws-sampa.sym 
 
 echo "" >&2
 echo "IMPORT: $NOBLEX" >&2
