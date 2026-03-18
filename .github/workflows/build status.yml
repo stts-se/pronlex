@@ -46,6 +46,10 @@ jobs:
 
     - name: Start server
       run: |
+       APPDIR=/tmp/appdir/sqlite
+       LOC=/tmp/appdir/sqlite
+       ENGINE=sqlite
+       PORT=8780
        bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
        sleep 20
 
