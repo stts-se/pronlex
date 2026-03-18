@@ -42,17 +42,29 @@ jobs:
        bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
        bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite -l /tmp/appdir/sqlite
        bash scripts/import.sh -e sqlite -f wikispeech-lexdata -a /tmp/appdir/sqlite -r master -l /tmp/appdir/sqlite
-       bash scripts/import.sh -e mariadb -f wikispeech-lexdata -a /tmp/appdir/sqlite -r master -l 'speechoid:@tcp(127.0.0.1:3306)'
+       bash scripts/import.sh -e mariadb -f wikispeech-lexdata -a /tmp/appdir/mariadb -r master -l 'speechoid:@tcp(127.0.0.1:3306)'
 
-    - name: Start server
+    - name: Start sqlite server
       run: |
        APPDIR=/tmp/appdir/sqlite
        LOC=/tmp/appdir/sqlite
        ENGINE=sqlite
        PORT=8780
        bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
+       
        sleep 20
 
-    - name: Ping server
+    - name: Start mariadb server
+      run: |
+       APPDIR=/tmp/appdir/mariadb
+       LOC='speechoid:@tcp(127.0.0.1:3306)'
+       ENGINE=mariadb
+       PORT=8781
+       bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
+
+       sleep 20
+
+    - name: Ping servers
       run: |
        curl -f http://localhost:8780/ping
+       curl -f http://localhost:8781/ping
