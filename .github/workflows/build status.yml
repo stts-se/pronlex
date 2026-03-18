@@ -49,4 +49,6 @@ jobs:
        bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
        sleep 20
 
+    - name: Ping server
+      run: |
        curl -f http://localhost:8780/ping
