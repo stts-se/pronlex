@@ -54,4 +54,4 @@ jobs:
        #echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
        #sleep $SLEEP
 
-       #curl http://localhost:8780/ping
+       #curl -f http://localhost:8780/ping
