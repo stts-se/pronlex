@@ -26,42 +26,41 @@ jobs:
 
     - name: Go report card
       uses: creekorful/goreportcard-action@v1.0
-      
+
     - name: Installation
       run: |
-	sudo apt install mariadb-client mariadb-server siege
-	cat go.mod
-	
+       sudo apt install mariadb-client mariadb-server siege
+       cat go.mod
+
     - name: Test
       run: go test -v ./...
 
     - name: Setup
       run: |
-	#RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
-	#RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC='speechoid:@tcp(127.0.0.1:3306)'
- 	bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
-	bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite -l /tmp/appdir/sqlite
-        bash scripts/import.sh -e sqlite -f wikispeech-lexdata -a /tmp/appdir/sqlite -r master -l /tmp/appdir/sqlite
-        bash scripts/import.sh -e mariadb -f wikispeech-lexdata -a /tmp/appdir/sqlite -r master -l 'speechoid:@tcp(127.0.0.1:3306)'
+       #RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
+       #RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC='speechoid:@tcp(127.0.0.1:3306)'
+       bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
+       bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite -l /tmp/appdir/sqlite
+       bash scripts/import.sh -e sqlite -f wikispeech-lexdata -a /tmp/appdir/sqlite -r master -l /tmp/appdir/sqlite
+       bash scripts/import.sh -e mariadb -f wikispeech-lexdata -a /tmp/appdir/sqlite -r master -l 'speechoid:@tcp(127.0.0.1:3306)'
 
     - name: Start server
       run: |
-	bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
-	export pid=$!
+       bash scripts/start_server.sh -a $APPDIR -e $ENGINE -l $LOC -p $PORT &
+       export pid=$!
 
-	ENGINE=sqlite
-	SLEEP=60
-	echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
-	sleep $SLEEP
+       ENGINE=sqlite
+       SLEEP=60
+       echo "pronlex $ENGINE server started on pid $pid. wait for $SLEEP seconds before shutting down"
+       sleep $SLEEP
 
-	curl "http://localhost:8780/lexicon/lookup?lexicons=sv_se_nst_lex:sv-se.nst&words=vi%20testar%20talsyntes" -r10 -50 &> /tmp/pronlex_curl.log
-	cat /tmp/pronlex_curl.log
-	egrep Failed /tmp/pronlex_curl.log | cut -f2 | egrep -cw 0
+       curl "http://localhost:8780/lexicon/lookup?lexicons=sv_se_nst_lex:sv-se.nst&words=vi%20testar%20talsyntes" -r10 -50 &> /tmp/pronlex_curl.log
+       cat /tmp/pronlex_curl.log
+       egrep Failed /tmp/pronlex_curl.log | cut -f2 | egrep -cw 0
 
-	sh .github/workflows/exit_server_and_fail_if_not_running.sh pronlex $pid
- 
-	
-	
+       sh .github/workflows/exit_server_and_fail_if_not_running.sh pronlex $pid
+        
+        
 
 
 
