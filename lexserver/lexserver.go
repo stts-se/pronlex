@@ -262,16 +262,25 @@ func getVersionInfo() []string {
 		res = append(res, "Application name: pronlex")
 		res = append(res, "Build timestamp: n/a")
 		res = append(res, "Built by: user")
-		tag, err := exec.Command("git", "describe", "--tags").Output()
+		commit, err := exec.Command("git", "rev-parse", "HEAD").Output()
+		if err != nil {
+			log.Printf("lexserver: couldn't retrieve git commit: %v", err)
+			commit = []byte("unknown")
+		}
+		branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
-			res = append(res, "Release: unknown")
+			branch = []byte("unknown")
+		}
+		tag, err := exec.Command("git", "describe", "--tags").Output()
+		if err == nil {
+			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
+			//res = append(res, "Release: unknown")
+			res = append(res, strings.TrimSpace(fmt.Sprintf("Commit: %s on branch %s",
+				strings.TrimSpace(string(commit[:7])),
+				strings.TrimSpace(string(branch)))))
+
 		} else {
-			branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
-			if err != nil {
-				log.Printf("lexserver: couldn't retrieve git release info: %v", err)
-				res = append(res, "Release: unknown")
-			}
 			res = append(res, strings.TrimSpace(fmt.Sprintf("Release: %s on branch %s",
 				strings.TrimSpace(string(tag)),
 				strings.TrimSpace(string(branch)))))
