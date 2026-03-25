@@ -221,13 +221,13 @@ else
     exit 1
 fi
 
-echo "" >&2
-if run_go_command importLex -createlex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name nb -locale nb_NO -lex_file $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing -symbolset $SS_FILES/nb-no_ws-sampa.sym ; then
-    echo -n ""
-else
-    echo "$LEXDB:nb FAILED" >&2
-    exit 1
-fi
+# echo "" >&2
+# if run_go_command importLex -createlex -db_engine $DBENGINE -db_location $DBLOCATION -db_name $LEXDB -lex_name nb -locale nb_NO -lex_file $DEMOFILES/nor030224NST.pron-ws.utf8.for_testing -symbolset $SS_FILES/nb-no_ws-sampa.sym ; then
+#     echo -n ""
+# else
+#     echo "$LEXDB:nb FAILED" >&2
+#     exit 1
+# fi
 
 echo "" >&2
 echo "IMPORT: $LEXDB:enu" >&2

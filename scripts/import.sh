@@ -186,10 +186,10 @@ if [ $DBENGINE == "sqlite" ]; then
     # 	echo "[$CMD] cannot create db if it already exists: $SVLEX" >&2
     # 	exit 1
     # fi
-    if [ -e $DBLOCATION/${NOBLEX}.db ]; then
-	echo "[$CMD] cannot create db if it already exists: $NOBLEX" >&2
-	exit 1
-    fi
+    # if [ -e $DBLOCATION/${NOBLEX}.db ]; then
+    # 	echo "[$CMD] cannot create db if it already exists: $NOBLEX" >&2
+    # 	exit 1
+    # fi
     if [ -e $DBLOCATION/${AMELEX}.db ]; then
 	echo "[$CMD] cannot create db if it already exists: $AMELEX" >&2
 	exit 1
@@ -207,7 +207,7 @@ elif [ $DBENGINE == "mariadb" ]; then
     # fi
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $SVLEXBRAXEN ; GRANT ALL PRIVILEGES ON $SVLEXBRAXEN.* TO '$MARIADB_USER'@'localhost' "
     # sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $SVLEX ; GRANT ALL PRIVILEGES ON $SVLEX.* TO '$MARIADB_USER'@'localhost' "
-    sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO '$MARIADB_USER'@'localhost' "
+    # sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $NOBLEX ; GRANT ALL PRIVILEGES ON $NOBLEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $AMELEX ; GRANT ALL PRIVILEGES ON $AMELEX.* TO '$MARIADB_USER'@'localhost' "
     sudo mysql -h $MARIADB_HOST $MARIADB_PORT -u root -e "create database $ARLEX ; GRANT ALL PRIVILEGES ON $ARLEX.* TO '$MARIADB_USER'@'localhost' "
 fi
@@ -260,9 +260,9 @@ import_sql $SVLEXBRAXEN $LEXDATA/sv-se/braxen/braxen-sv-ws
 # echo "IMPORT: $SVLEX" >&2
 # import_sql $SVLEX $LEXDATA/sv-se/nst/swe030224NST.pron-ws.utf8
 
-echo "" >&2
-echo "IMPORT: $NOBLEX" >&2
-import_sql $NOBLEX $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8
+# echo "" >&2
+# echo "IMPORT: $NOBLEX" >&2
+# import_sql $NOBLEX $LEXDATA/nb-no/nst/nor030224NST.pron-ws.utf8
 
 echo "" >&2
 echo "IMPORT: $AMELEX" >&2
