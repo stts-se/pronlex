@@ -47,6 +47,17 @@ var langCodes = map[string]string{
 	"ind": "foreign",
 }
 
+var stopList = map[string]string{
+	"bin":    "\" b I n",
+	"dager":  "\"\" d A: . % g @ r",
+	"måttet": "\"\" m O . % t @ t",
+	"ordet":  "\" u: . r @",
+	"skal":   "\" s k a l",
+	"stod":   "\" s t u:",
+	"tid":    "\" t i:",
+	"tok":    "\" t U k",
+}
+
 // map to filter out duplicates, key is 'orth <tab> trans <tab> pos <tab> lang'
 var printed = make(map[string]bool)
 
@@ -64,6 +75,9 @@ func removableLine(orth string, line string, e lex.Entry) (string, bool) {
 	}
 	if !validSymbols.MatchString(strings.ToLower(orth)) {
 		return "symbolset", true
+	}
+	if stopTrans, ok := stopList[orth]; ok && stopTrans == trans {
+		return "stoplist", true
 	}
 	// if upperCase.MatchString(orth) && strings.HasPrefix(e.PartOfSpeech, "RG") { // roman numerals
 	// 	return true

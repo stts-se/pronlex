@@ -20,8 +20,8 @@ Options:
   -r lexdata release tag (default: master)
   -b use go binaries (optional, as opposed to 'go run' with source code)
 
-Imports lexicon data for Swedish, Norwegian, US English, and a small set of test data for Arabic from the wikispeech-lexdata repository.
-Imports from sql dump files (file extension .sql.gz).
+Imports lexicon data for Swedish and US English from the wikispeech-lexdata repository.
+Imports from lexicon files (file extension .gz).
 If the lexdata folder doesn't exist, it will be downloaded from github: https://github.com/stts-se/wikispeech-lexdata 
 
 If you don't know what release tag you should use, you should probably use master.
