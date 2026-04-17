@@ -274,8 +274,11 @@ func getVersionInfo() []string {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 			branch = []byte("unknown")
 		}
+		res = append(res, strings.TrimSpace(fmt.Sprintf("Commit %s on branch %s",
+			strings.TrimSpace(string(commit[:7])),
+			strings.TrimSpace(string(branch)))))
 		tag, err := exec.Command("git", "describe", "--tags").Output()
-		if err == nil {
+		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 			//res = append(res, "Release: unknown")
 			res = append(res, strings.TrimSpace(fmt.Sprintf("Commit %s on branch %s",
@@ -283,7 +286,7 @@ func getVersionInfo() []string {
 				strings.TrimSpace(string(branch)))))
 
 		} else {
-			res = append(res, strings.TrimSpace(fmt.Sprintf("Release: %s on branch %s",
+			res = append(res, strings.TrimSpace(fmt.Sprintf("Release %s on branch %s",
 				strings.TrimSpace(string(tag)),
 				strings.TrimSpace(string(branch)))))
 		}
