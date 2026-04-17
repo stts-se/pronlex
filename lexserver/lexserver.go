@@ -250,8 +250,10 @@ func versionHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, strings.Join(vInfo, "\n"))
 }
 
+var startedTimestamp = time.Now()
+
 // UTC time with format: yyyy-MM-dd HH:mm:ss z | %Y-%m-%d %H:%M:%S %Z
-var startedTimestamp = time.Now().UTC().Format("2006-01-02 15:04:05 MST")
+const timestampFmt = "2006-01-02 15:04:05 CEST" // time.UnixDate // "%Y-%m-%d %H:%M:%S" // "2019-11-04 15:34 CET"
 
 func getVersionInfo() []string {
 	res := []string{}
@@ -260,8 +262,8 @@ func getVersionInfo() []string {
 		//var msg = fmt.Sprintf("lexserver: build info not defined : no such file: %s\n", buildInfoFile)
 		//log.Print(msg)
 		res = append(res, "Application name: pronlex")
-		res = append(res, "Build timestamp: n/a")
-		res = append(res, "Built by: user")
+		//res = append(res, "Build timestamp: n/a")
+		//res = append(res, "Built by: user")
 		commit, err := exec.Command("git", "rev-parse", "HEAD").Output()
 		if err != nil {
 			log.Printf("lexserver: couldn't retrieve git commit: %v", err)
@@ -276,7 +278,7 @@ func getVersionInfo() []string {
 		if err == nil {
 			log.Printf("lexserver: couldn't retrieve git release info: %v", err)
 			//res = append(res, "Release: unknown")
-			res = append(res, strings.TrimSpace(fmt.Sprintf("Commit: %s on branch %s",
+			res = append(res, strings.TrimSpace(fmt.Sprintf("Commit %s on branch %s",
 				strings.TrimSpace(string(commit[:7])),
 				strings.TrimSpace(string(branch)))))
 
@@ -299,7 +301,7 @@ func getVersionInfo() []string {
 			res = strings.Split(strings.TrimSpace(string(fBytes)), "\n")
 		}
 	}
-	res = append(res, "Started: "+startedTimestamp)
+	res = append(res, "Started: "+startedTimestamp.Format(timestampFmt))
 	//log.Println("lexserver: parsed version info", res)
 	return res
 }
