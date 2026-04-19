@@ -51,7 +51,7 @@ var stopList = map[string]string{
 	"bin":    "\" b I n",
 	"dager":  "\"\" d A: . % g @ r",
 	"måttet": "\"\" m O . % t @ t",
-	"ord":    "\" u:",
+	"ord":    "\" u: r",
 	"ordet":  "\" u: . r @",
 	"skal":   "\" s k a l",
 	"stod":   "\" s t u:",
