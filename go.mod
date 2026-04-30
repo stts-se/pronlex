@@ -5,7 +5,7 @@ go 1.25
 require (
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/go-errors/errors v1.5.1
-	github.com/go-sql-driver/mysql v1.9.3
+	github.com/go-sql-driver/mysql v1.10.0
 	github.com/gorilla/mux v1.8.1
 	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/stts-se/rbg2p v1.1.0
@@ -14,4 +14,4 @@ require (
 	golang.org/x/text v0.34.0
 )
 
-require filippo.io/edwards25519 v1.1.1 // indirect
+require filippo.io/edwards25519 v1.2.0 // indirect
