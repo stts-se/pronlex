@@ -37,8 +37,8 @@ jobs:
 
     - name: Setup
       run: |
-       #RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
-       #RELEASE=master SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC='speechoid:@tcp(127.0.0.1:3306)'
+       #RELEASE=${{ github.ref_name }} SLEEP=60 DO_IMPORT=1 ENGINE=sqlite PORT=8780 APPDIR=/tmp/appdir/sqlite LOC=/tmp/appdir/sqlite
+       #RELEASE=${{ github.ref_name }} SLEEP=60 DO_IMPORT=1 ENGINE=mariadb PORT=8780 APPDIR=/tmp/appdir/mariadb LOC='speechoid:@tcp(127.0.0.1:3306)'
        bash scripts/setup.sh -a /tmp/appdir/mariadb -e mariadb -l 'speechoid:@tcp(127.0.0.1:3306)'
        bash scripts/setup.sh -a /tmp/appdir/sqlite -e sqlite -l /tmp/appdir/sqlite
        bash scripts/import.sh -e sqlite -f wikispeech-lexdata -a /tmp/appdir/sqlite -r ${{ github.ref_name }} -l /tmp/appdir/sqlite
