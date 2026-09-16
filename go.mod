@@ -5,12 +5,12 @@ go 1.26.0
 require (
 	github.com/dlclark/regexp2 v1.12.0
 	github.com/go-errors/errors v1.5.1
-	github.com/go-sql-driver/mysql v1.10.0
+	github.com/go-sql-driver/mysql v1.10.1
 	github.com/gorilla/mux v1.8.1
-	github.com/mattn/go-sqlite3 v1.14.44
+	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/stts-se/rbg2p v1.1.0
 	github.com/stts-se/symbolset v0.0.0-20260206123505-2a5e13777cf9
-	golang.org/x/net v0.55.0
+	golang.org/x/net v0.59.0
 	golang.org/x/text v0.42.0
 )
 
